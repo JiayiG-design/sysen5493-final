@@ -1,0 +1,9 @@
+{
+  "title": "Monthly defect rate after process improvement",
+  "x_label": "Month",
+  "y_label": "Defects per 1,000 units",
+  "background": "#ffffff",
+  "colors": ["#005ab5", "#dc3220", "#009e73"],
+  "font_size": 13,
+  "alt_text": "Line chart showing defect rates decreasing after the new review checkpoint was introduced."
+}

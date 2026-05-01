@@ -1,0 +1,9 @@
+{
+  "title": "Results",
+  "x_label": "",
+  "y_label": "",
+  "background": "#ffffff",
+  "colors": ["#ffff99", "#cccccc", "#ff9999"],
+  "font_size": 9,
+  "alt_text": "Chart of results."
+}
