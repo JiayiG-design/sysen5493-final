@@ -8,7 +8,7 @@ from typing import Any
 from .color import contrast_ratio
 
 MIN_CONTRAST_RATIO = 3.0
-MIN_FONT_SIZE = 12
+MIN_FONT_SIZE = 14
 MIN_ALT_TEXT_WORDS = 8
 
 
