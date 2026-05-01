@@ -12,7 +12,7 @@ plain-language alt text.
 ```bash
 python -m chartaccess examples/good_chart.json
 python -m chartaccess examples/bad_chart.json
-python -m unittest discover
+python -m unittest discover -s tests
 ```
 
 ## Why This Is A Systems Engineering Problem
