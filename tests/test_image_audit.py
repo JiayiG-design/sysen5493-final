@@ -50,7 +50,7 @@ class ImageAuditTests(unittest.TestCase):
         self.assertTrue(any(color in metadata["prominent_colors"] for color in ["#000000", "#0060c0"]))
         self.assertTrue(any("contrast" in finding.requirement.lower() for finding in findings))
 
-    def test_png_image_with_low_contrast_content_fails_contrast(self):
+    def test_png_image_with_low_contrast_content_fails_soft_pixel_share(self):
         width, height = 30, 20
         white = (255, 255, 255)
         pale = (245, 245, 170)
@@ -64,10 +64,10 @@ class ImageAuditTests(unittest.TestCase):
             write_test_png(path, width, height, pixels)
             findings, _ = audit_png(path)
 
-        contrast_finding = next(
-            finding for finding in findings if finding.requirement.startswith("Prominent chart colors")
+        soft_pixel_finding = next(
+            finding for finding in findings if finding.requirement.startswith("Soft or low-contrast pixels")
         )
-        self.assertFalse(contrast_finding.passed)
+        self.assertFalse(soft_pixel_finding.passed)
 
 
 if __name__ == "__main__":

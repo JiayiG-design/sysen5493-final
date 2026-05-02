@@ -36,11 +36,12 @@ Then open:
 http://127.0.0.1:8000
 ```
 
-Upload a PNG chart export. The image workflow estimates:
+Upload a PNG chart, poster table, or presentation graphic export. The image
+workflow estimates:
 
 - background color
 - prominent chart colors
-- contrast against the background
+- whether prominent colors work as marks or readable text backgrounds
 - whether high-contrast text or axis marks appear to be present
 - whether low-contrast pixels dominate the chart
 

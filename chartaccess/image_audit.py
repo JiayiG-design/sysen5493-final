@@ -11,7 +11,8 @@ from .png_image import PngImage, most_common_color, quantized_color, read_png, r
 
 MIN_IMAGE_CONTRAST = 3.0
 MIN_TEXTLIKE_PIXEL_SHARE = 0.01
-MAX_LOW_CONTRAST_SHARE = 0.35
+MIN_TEXT_ON_FILL_CONTRAST = 4.5
+MAX_LOW_CONTRAST_SHARE = 0.60
 
 
 def audit_png(path: str | Path) -> tuple[list[AuditFinding], dict[str, object]]:
@@ -28,11 +29,14 @@ def audit_image(image: PngImage) -> tuple[list[AuditFinding], dict[str, object]]
     palette_hex = [rgb_to_hex(color) for color in palette]
     contrast_values = [contrast_ratio(color, background_hex) for color in palette_hex]
 
-    low_contrast = [
-        f"{color} ({ratio:.2f}:1)"
-        for color, ratio in zip(palette_hex, contrast_values)
-        if ratio < MIN_IMAGE_CONTRAST
-    ]
+    low_usability = []
+    for color, ratio in zip(palette_hex, contrast_values):
+        black_text_ratio = contrast_ratio(color, "#000000")
+        white_text_ratio = contrast_ratio(color, "#ffffff")
+        if ratio < MIN_IMAGE_CONTRAST and max(black_text_ratio, white_text_ratio) < MIN_TEXT_ON_FILL_CONTRAST:
+            low_usability.append(
+                f"{color} ({ratio:.2f}:1 vs background; best text contrast {max(black_text_ratio, white_text_ratio):.2f}:1)"
+            )
     textlike_share = _textlike_pixel_share(image, background_hex)
     low_contrast_share = _low_contrast_pixel_share(image, background_hex)
 
@@ -43,11 +47,11 @@ def audit_image(image: PngImage) -> tuple[list[AuditFinding], dict[str, object]]
             f"Detected {len(palette_hex)} prominent non-background color(s).",
         ),
         AuditFinding(
-            "Prominent chart colors meet minimum contrast against the estimated background",
-            not low_contrast,
-            "Low-contrast prominent colors: " + ", ".join(low_contrast)
-            if low_contrast
-            else f"Prominent colors meet {MIN_IMAGE_CONTRAST}:1 contrast.",
+            "Prominent colors are usable as marks or readable text backgrounds",
+            not low_usability,
+            "Colors with weak mark and text contrast: " + ", ".join(low_usability)
+            if low_usability
+            else "Prominent colors either contrast with the page or support readable black/white text.",
         ),
         AuditFinding(
             "Chart appears to contain readable text or axis marks",
@@ -55,7 +59,7 @@ def audit_image(image: PngImage) -> tuple[list[AuditFinding], dict[str, object]]
             f"High-contrast text/mark pixel share is {textlike_share:.1%}; target is at least {MIN_TEXTLIKE_PIXEL_SHARE:.1%}.",
         ),
         AuditFinding(
-            "Low-contrast pixels do not dominate the chart",
+            "Soft or low-contrast pixels do not overwhelm the visual",
             low_contrast_share <= MAX_LOW_CONTRAST_SHARE,
             f"Low-contrast non-background pixel share is {low_contrast_share:.1%}; target is at most {MAX_LOW_CONTRAST_SHARE:.0%}.",
         ),
