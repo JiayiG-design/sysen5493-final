@@ -7,18 +7,46 @@ AI-augmented final project for SYSEN 5493.
 ChartAccess Audit is a small command-line tool that checks whether a chart design
 meets basic accessibility and inclusivity requirements. It turns graph design
 guidelines into measurable checks for color contrast, font size, labels, and
-plain-language alt text.
+plain-language alt text. It supports both structured JSON checks and a local PNG
+upload workflow for quick visual audits.
 
 ## Quick Start
 
 ```bash
 python -m chartaccess examples/good_chart.json
 python -m chartaccess examples/bad_chart.json
+python -m chartaccess --image path/to/chart.png
 python -m unittest discover -s tests
 ```
 
 The `good_chart.json` example should pass all requirements. The
 `bad_chart.json` example should fail and explain what needs to be improved.
+
+## Upload A Chart Image
+
+Run the local upload app:
+
+```bash
+python -m chartaccess.webapp
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000
+```
+
+Upload a PNG chart export. The image workflow estimates:
+
+- background color
+- prominent chart colors
+- contrast against the background
+- whether high-contrast text or axis marks appear to be present
+- whether low-contrast pixels dominate the chart
+
+Image mode is intentionally lightweight. It does **not** OCR exact chart titles
+or axis labels, so the JSON workflow is still the most precise option when you
+know the chart metadata.
 
 ## Why This Is A Systems Engineering Problem
 
@@ -42,12 +70,16 @@ and produces a report that supports design iteration.
 chartaccess/
   audit.py       # Requirement checks and scoring
   color.py       # WCAG contrast calculation
+  image_audit.py # PNG image audit heuristics
+  png_image.py   # Dependency-free PNG reader
+  webapp.py      # Local browser upload app
   __main__.py    # Command-line report
 examples/
   good_chart.json
   bad_chart.json
 tests/
   test_audit.py
+  test_image_audit.py
 docs/
   AI_COLLABORATION.md
 ```
@@ -57,6 +89,7 @@ docs/
 ```bash
 python -m chartaccess examples/good_chart.json
 python -m chartaccess examples/bad_chart.json
+python -m chartaccess.webapp
 python -m unittest discover -s tests
 git log --oneline --graph --all
 ```
